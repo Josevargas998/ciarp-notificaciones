@@ -5,10 +5,10 @@ param (
     [switch]$Real
 )
 
-$ciarpPath    = "C:\Users\Admin\Downloads\docentes\ciarp 2.xlsx"
-$correosPath  = "C:\Users\Admin\Downloads\docentes\correos.xlsx"
-$tokensPath   = "C:\Users\Admin\Downloads\docentes\tokens.json"
-$credsPath    = "C:\Users\Admin\Downloads\docentes\credentials.json"
+$ciarpPath    = Join-Path $PSScriptRoot "ciarp 2.xlsx"
+$correosPath  = Join-Path $PSScriptRoot "correos.xlsx"
+$tokensPath   = Join-Path $PSScriptRoot "tokens.json"
+$credsPath    = Join-Path $PSScriptRoot "credentials.json"
 
 # Unicode character codes for Spanish accents
 $char_i_accent = [char]0xed
@@ -580,7 +580,7 @@ if ($Test) {
     }
 
     $timestamp  = Get-Date -Format "yyyyMMdd_HHmmss"
-    $reportPath = "C:\Users\Admin\Downloads\docentes\reporte_ciarp_prueba_$timestamp.xlsx"
+    $reportPath = Join-Path $PSScriptRoot "reporte_ciarp_prueba_$timestamp.xlsx"
     Generate-Report $reportRows $reportPath
 }
 
@@ -657,7 +657,7 @@ if ($TestAll) {
     Write-Host "Enviados: $sentCount | Fallidos: $failCount" -ForegroundColor Cyan
 
     $timestamp  = Get-Date -Format "yyyyMMdd_HHmmss"
-    $reportPath = "C:\Users\Admin\Downloads\docentes\reporte_ciarp_prueba_$timestamp.xlsx"
+    $reportPath = Join-Path $PSScriptRoot "reporte_ciarp_prueba_$timestamp.xlsx"
     Generate-Report $reportRows $reportPath
 }
 
@@ -747,6 +747,6 @@ if ($Real) {
     Write-Host "Fallidos o sin correo: $failCount" -ForegroundColor Red
 
     $timestamp  = Get-Date -Format "yyyyMMdd_HHmmss"
-    $reportPath = "C:\Users\Admin\Downloads\docentes\reporte_ciarp_$timestamp.xlsx"
+    $reportPath = Join-Path $PSScriptRoot "reporte_ciarp_$timestamp.xlsx"
     Generate-Report $reportRows $reportPath
 }

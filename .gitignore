@@ -2,8 +2,12 @@
 tokens.json
 credentials.json
 
+# Reportes generados automáticamente - NO subir
+reporte_ciarp*.xlsx
+
 # Archivos Excel de datos institucionales - NO subir
-# *.xlsx
+# ciarp 2.xlsx
+# correos.xlsx
 
 # Archivos de debug temporales
 debug_*.ps1
