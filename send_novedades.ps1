@@ -349,6 +349,12 @@ while ($maxEmpty -lt 8) {
     $tituloArt = Get-CellValue $shPub $r 4
     if (-not $dni -and -not $tituloArt) { $maxEmpty++; $r++; continue }
     $maxEmpty = 0
+    
+    # Ignorar notas al pie o filas donde el DNI no contenga numeros
+    if ($dni -match "[a-zA-Z]" -and $dni -notmatch "\d") {
+        $r++; continue
+    }
+    
     if ($dni) {
         $nombre   = Get-CellValue $shPub $r 18
         $programa = Get-CellValue $shPub $r 22
