@@ -14,6 +14,10 @@ $credsPath    = Join-Path $PSScriptRoot "credentials.json"
 $char_i_accent = [char]0xed
 $char_a_accent = [char]0xe1
 $char_o_accent = [char]0xf3
+$char_e_accent = [char]0xe9
+
+# Nota de comision (sin tildes hardcodeadas para evitar problemas de encoding)
+$notaComisionDefault = "Los puntos ser" + $char_a_accent + "n pagados al t" + $char_e_accent + "rmino de la comisi" + $char_o_accent + "n acad" + $char_e_accent + "mica-administrativa."
 
 $tituloConcepto  = "T" + $char_i_accent + "tulo universitario de posgrado"
 $articuloConcepto = "Art" + $char_i_accent + "culo en revista indexada"
@@ -168,11 +172,17 @@ function Send-GmailMessage {
 # ---------------------------------------------------------------------------
 function Build-EmailHtml ($fullName, $programa, $facultad, $firstActa, $rowsHtml, $sumStr, $notaComision="") {
     $notaHtml = ""
+    $parrafoActo = ""
     if ($notaComision) {
+        # Cuando hay comision: fusionar la nota + el parrafo del acto administrativo en la caja azul
         $notaHtml = "<div style='background-color:#e3f2fd;border-left:4px solid #1565c0;padding:14px 16px;margin-top:20px;border-radius:0 4px 4px 0;font-size:14px;color:#0d47a1'>" +
-                    "<strong>Nota sobre comisi&oacute;n acad&eacute;mica-administrativa:</strong><br>" + $notaComision + "</div>"
+                    "<strong>Nota sobre comisi&oacute;n acad&eacute;mica-administrativa:</strong><br>" + $notaComision +
+                    "<br><br>Una vez concluida la comisi&oacute;n, con posterioridad se estar&aacute; notificando el correspondiente acto administrativo.</div>"
+    } else {
+        # Sin comision: parrafo estandar
+        $parrafoActo = "<p style='margin-top:20px'>Por lo anteriormente mencionado, con posterioridad se estara notificando el correspondiente acto administrativo.</p>"
     }
-    return "<html><head><meta charset='utf-8'><style>body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#f4f6f8;margin:0;padding:20px}.card{max-width:650px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.05)}.header{background-color:#1b5e20;color:#fff;padding:25px 20px;text-align:center}.header h1{margin:0;font-size:26px;font-weight:700;letter-spacing:1px}.header p{margin:6px 0 0;font-size:13px;opacity:.9}.content{padding:30px;color:#2d3748;line-height:1.6}.docente-info{background:#f8fafc;border-left:4px solid #1b5e20;padding:15px;margin-bottom:25px;border-radius:0 4px 4px 0}.docente-info p{margin:0;font-size:14px;color:#4a5568}.docente-info .name{font-size:16px;font-weight:700;color:#1b5e20;text-transform:uppercase;margin-bottom:4px}.greeting{font-size:15px;font-weight:700;margin-bottom:15px}.table-container{margin:20px 0;overflow-x:auto}table{width:100%;border-collapse:collapse;border:1px solid #e0e0e0}th{background-color:#1b5e20;color:#fff;padding:12px;font-size:14px;text-align:left}.total-box{background-color:#e8f5e9;border:1px solid #c8e6c9;padding:12px 15px;border-radius:4px;font-size:15px;font-weight:700;color:#2e7d32;margin-top:15px}.signature{margin-top:30px;font-size:14px;color:#4a5568;line-height:1.4;border-top:1px solid #e2e8f0;padding-top:20px}</style></head><body><div class='card'><div class='header'><h1>CIARP</h1><p>Comite Interno de Asignacion y Reconocimiento de Puntaje</p></div><div class='content'><h2 style='color:#1b5e20;text-align:center;margin-top:0;margin-bottom:25px;font-size:20px'>Reconocimiento de Puntos Salariales</h2><div class='docente-info'><p class='name'>" + $fullName + "</p><p><strong>Programa:</strong> " + $programa + "</p><p><strong>Facultad:</strong> " + $facultad + "</p></div><p class='greeting'>Cordial saludo,</p><p>Dando cumplimiento a la directriz emitida por la jefe de la Oficina de Asuntos Profesionales, me permito informarle que, en sesion del Comite Interno de Asignacion y Reconocimiento de Puntaje (CIARP), llevada a cabo segun consta en <strong>" + $firstActa + "</strong>, la solicitud de asignacion de puntos salariales presentada por usted fue considerada y aprobada como se relaciona a continuacion:</p><div class='table-container'><table><thead><tr><th style='width:30%'>Concepto</th><th style='width:50%'>Detalle del Producto</th><th style='width:20%;text-align:right'>Puntaje</th></tr></thead><tbody>" + $rowsHtml + "</tbody></table></div><div class='total-box'>Puntaje total aprobado en esta sesion: " + $sumStr + " puntos</div>" + $notaHtml + "<p style='margin-top:20px'>Por lo anteriormente mencionado, con posterioridad se estara notificando el correspondiente acto administrativo.</p><p>Cualquier inquietud al respecto, estaremos atentos.</p><div class='signature'>Atentamente,<br><br><div style='background-color:#f1f8e9;border:1px solid #dcedc8;padding:15px;border-radius:4px;text-align:center;color:#1b5e20;font-weight:700;font-size:16px'>Luz Amparo Celis Burtic&aacute;<br><span style='font-size:14px;font-weight:400;color:#2e7d32'>Jefe Oficina de Asuntos Profesorales</span></div></div></div></div></body></html>"
+    return "<html><head><meta charset='utf-8'><style>body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#f4f6f8;margin:0;padding:20px}.card{max-width:650px;margin:0 auto;background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.05)}.header{background-color:#1b5e20;color:#fff;padding:25px 20px;text-align:center}.header h1{margin:0;font-size:26px;font-weight:700;letter-spacing:1px}.header p{margin:6px 0 0;font-size:13px;opacity:.9}.content{padding:30px;color:#2d3748;line-height:1.6}.docente-info{background:#f8fafc;border-left:4px solid #1b5e20;padding:15px;margin-bottom:25px;border-radius:0 4px 4px 0}.docente-info p{margin:0;font-size:14px;color:#4a5568}.docente-info .name{font-size:16px;font-weight:700;color:#1b5e20;text-transform:uppercase;margin-bottom:4px}.greeting{font-size:15px;font-weight:700;margin-bottom:15px}.table-container{margin:20px 0;overflow-x:auto}table{width:100%;border-collapse:collapse;border:1px solid #e0e0e0}th{background-color:#1b5e20;color:#fff;padding:12px;font-size:14px;text-align:left}.total-box{background-color:#e8f5e9;border:1px solid #c8e6c9;padding:12px 15px;border-radius:4px;font-size:15px;font-weight:700;color:#2e7d32;margin-top:15px}.signature{margin-top:30px;font-size:14px;color:#4a5568;line-height:1.4;border-top:1px solid #e2e8f0;padding-top:20px}</style></head><body><div class='card'><div class='header'><h1>CIARP</h1><p>Comite Interno de Asignacion y Reconocimiento de Puntaje</p></div><div class='content'><h2 style='color:#1b5e20;text-align:center;margin-top:0;margin-bottom:25px;font-size:20px'>Reconocimiento de Puntos Salariales</h2><div class='docente-info'><p class='name'>" + $fullName + "</p><p><strong>Programa:</strong> " + $programa + "</p><p><strong>Facultad:</strong> " + $facultad + "</p></div><p class='greeting'>Cordial saludo,</p><p>Dando cumplimiento a la directriz emitida por la jefe de la Oficina de Asuntos Profesionales, me permito informarle que, en sesion del Comite Interno de Asignacion y Reconocimiento de Puntaje (CIARP), llevada a cabo segun consta en <strong>" + $firstActa + "</strong>, la solicitud de asignacion de puntos salariales presentada por usted fue considerada y aprobada como se relaciona a continuacion:</p><div class='table-container'><table><thead><tr><th style='width:30%'>Concepto</th><th style='width:50%'>Detalle del Producto</th><th style='width:20%;text-align:right'>Puntaje</th></tr></thead><tbody>" + $rowsHtml + "</tbody></table></div><div class='total-box'>Puntaje total aprobado en esta sesion: " + $sumStr + " puntos</div>" + $notaHtml + $parrafoActo + "<p>Cualquier inquietud al respecto, estaremos atentos.</p><div class='signature'>Atentamente,<br><br><div style='background-color:#f1f8e9;border:1px solid #dcedc8;padding:15px;border-radius:4px;text-align:center;color:#1b5e20;font-weight:700;font-size:16px'>Luz Amparo Celis Burtic&aacute;<br><span style='font-size:14px;font-weight:400;color:#2e7d32'>Jefe Oficina de Asuntos Profesorales</span></div></div></div></div></body></html>"
 }
 
 function Build-RowsHtml ($products) {
@@ -345,7 +355,7 @@ while ($maxEmpty -lt 8) {
     $nota = ""
     if ($obs -match "comisi") {
         if ($obs -match "(Los puntos[^\n]+comisi[^\n]+\.)") { $nota = $matches[1] }
-        else { $nota = "Los puntos serán pagados al término de la comisión académica-administrativa." }
+        else { $nota = $notaComisionDefault }
     }
     $allProducts += [PSCustomObject]@{ Dni=($dni -replace '[^\d]',''); Concepto=$tituloConcepto; Detalle=$detail; Puntaje=$pts; Acta=$acta; Nota=$nota }
     $r++
@@ -375,7 +385,7 @@ while ($maxEmpty -lt 8) {
         $nota = ""
         if ($obs -match "comisi") {
             if ($obs -match "(Los puntos[^\n]+comisi[^\n]+\.)") { $nota = $matches[1] }
-            else { $nota = "Los puntos serán pagados al término de la comisión académica-administrativa." }
+            else { $nota = $notaComisionDefault }
         }
         $allProducts += [PSCustomObject]@{ Dni=($dni -replace '[^\d]',''); Concepto=$concepto; Detalle=$detail; Puntaje=$pts; Acta="Acta No. 2 del 04 de junio de 2026"; Nota=$nota }
     }
@@ -404,7 +414,7 @@ while ($maxEmpty -lt 8) {
         $nota = ""
         if ($obs -match "comisi") {
             if ($obs -match "(Los puntos[^\n]+comisi[^\n]+\.)") { $nota = $matches[1] }
-            else { $nota = "Los puntos serán pagados al término de la comisión académica-administrativa." }
+            else { $nota = $notaComisionDefault }
         }
         $allProducts += [PSCustomObject]@{ Dni=($dni -replace '[^\d]',''); Concepto="Libro de ensayo"; Detalle=$detail; Puntaje=$pts; Acta=$acta; Nota=$nota }
     }
@@ -433,7 +443,7 @@ while ($maxEmpty -lt 8) {
         $nota = ""
         if ($obs -match "comisi") {
             if ($obs -match "(Los puntos[^\n]+comisi[^\n]+\.)") { $nota = $matches[1] }
-            else { $nota = "Los puntos serán pagados al término de la comisión académica-administrativa." }
+            else { $nota = $notaComisionDefault }
         }
         $allProducts += [PSCustomObject]@{ Dni=($dni -replace '[^\d]',''); Concepto="Libro de texto"; Detalle=$detail; Puntaje=$pts; Acta=$acta; Nota=$nota }
     }
@@ -467,7 +477,7 @@ while ($maxEmpty -lt 8) {
             if ($obs -match "(Los puntos[^\n]+comisi[^\n]+\.)") {
                 $nota = $matches[1]
             } else {
-                $nota = "Los puntos serán pagados al término de la comisión académica-administrativa."
+                $nota = $notaComisionDefault
             }
         }
         $allProducts += [PSCustomObject]@{ Dni=($dni -replace '[^\d]',''); Concepto="Premio nacional"; Detalle=$detail; Puntaje=$pts; Acta=$acta; Nota=$nota }
