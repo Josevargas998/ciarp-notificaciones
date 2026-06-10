@@ -1,0 +1,19 @@
+# Tokens y credenciales OAuth - NO subir
+tokens.json
+credentials.json
+
+# Archivos Excel de datos institucionales - NO subir
+*.xlsx
+
+# Archivos de debug temporales
+debug_*.ps1
+debug_*.txt
+check_*.ps1
+count_*.ps1
+inspect_*.ps1
+resumen_ciarp*.ps1
+resumen_ciarp2*.ps1
+parsed_docentes.json
+
+# Carpeta de previews
+previews/
