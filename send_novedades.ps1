@@ -2,7 +2,8 @@
 param (
     [switch]$Test,
     [switch]$TestAll,
-    [switch]$Real
+    [switch]$Real,
+    [int]$Sesion
 )
 
 $ciarpPath    = Join-Path $PSScriptRoot "novedades2.xlsx"
@@ -364,6 +365,13 @@ while ($maxEmpty -lt 8) {
         $revista  = Get-CellValue $shPub $r 9
         $fechaPub = Get-CellValue $shPub $r 16
         $acta     = Get-CellValue $shPub $r 26
+        
+        if ($Sesion -gt 0) {
+            if ($acta -notmatch "^$Sesion\s*-" -and $acta -notmatch "No\.\s*$Sesion\b") {
+                $r++; continue
+            }
+        }
+
         $obs      = Get-CellValue $shPub $r 27
         $concepto = "art&iacute;culo"
         
