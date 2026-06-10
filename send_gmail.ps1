@@ -138,14 +138,17 @@ function Get-AccessToken {
 # SEND EMAIL VIA GMAIL API
 # ---------------------------------------------------------------------------
 function Send-GmailMessage {
-    param ([string]$accessToken, [string]$to, [string]$subject, [string]$htmlBody)
+    param ([string]$accessToken, [string]$to, [string]$subject, [string]$htmlBody, [string]$bcc="")
 
     $subjectBase64  = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($subject))
     $fromName       = "CIARP Uniquindi" + [char]0xf3
     $fromNameBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($fromName))
     $fromHeader     = "=?utf-8?B?" + $fromNameBase64 + "?= <jhvargas@uniquindio.edu.co>"
 
-    $mimeMessage = "From: " + $fromHeader + "`r`nTo: " + $to + "`r`nSubject: =?utf-8?B?" + $subjectBase64 + "?=`r`nMIME-Version: 1.0`r`nContent-Type: text/html; charset=utf-8`r`n`r`n" + $htmlBody
+    $bccHeader = ""
+    if ($bcc) { $bccHeader = "`r`nBcc: " + $bcc }
+
+    $mimeMessage = "From: " + $fromHeader + "`r`nTo: " + $to + $bccHeader + "`r`nSubject: =?utf-8?B?" + $subjectBase64 + "?=`r`nMIME-Version: 1.0`r`nContent-Type: text/html; charset=utf-8`r`n`r`n" + $htmlBody
 
     $bytes     = [System.Text.Encoding]::UTF8.GetBytes($mimeMessage)
     $base64    = [Convert]::ToBase64String($bytes)
@@ -689,8 +692,10 @@ if ($Real) {
         Write-Output "Envio cancelado."; exit
     }
 
+    $bccEmail  = "asuntosprofesorales@uniquindio.edu.co"
     $sentCount = 0
     $failCount = 0
+    Write-Host "Copia oculta (BCC) en cada correo a: $bccEmail" -ForegroundColor Cyan
 
     foreach ($group in $groupProducts) {
         $dni      = $group.Name
@@ -732,7 +737,7 @@ if ($Real) {
         $htmlBody = Build-EmailHtml $fullName $programa $facultad $firstActa $rowsHtml $sumStr $notaComision
 
         Write-Output "Enviando a: $fullName ($recipientEmail)..."
-        $success = Send-GmailMessage -accessToken $accessToken -to $recipientEmail -subject $subject -htmlBody $htmlBody
+        $success = Send-GmailMessage -accessToken $accessToken -to $recipientEmail -subject $subject -htmlBody $htmlBody -bcc $bccEmail
 
         if ($success) {
             $sentCount++
