@@ -3,7 +3,7 @@ tokens.json
 credentials.json
 
 # Archivos Excel de datos institucionales - NO subir
-*.xlsx
+# *.xlsx
 
 # Archivos de debug temporales
 debug_*.ps1
