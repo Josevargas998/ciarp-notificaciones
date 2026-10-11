@@ -21,3 +21,6 @@ parsed_docentes.json
 
 # Carpeta de previews
 previews/
+
+# Archivos temporales de Excel
+~$*
